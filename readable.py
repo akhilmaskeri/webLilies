@@ -1,10 +1,32 @@
-import sys
+import os
 import re
+import shutil
 import requests
 from urllib.parse import urlsplit
 from bs4 import BeautifulSoup
 
 from readability import Document
+
+valid_tags = [
+    "a", "abbr", "acronym", "address", "applet",
+    "b", "bdo", "big", "blockquote", "br",
+    "body",
+    "cite", "code",
+    "del", "dfn", "div", "dl",
+    "em",
+    "h1", "h2", "h3", "h4", "h5", "h6", "hr",
+    "html", "head", "title",
+    "i", "iframe", "img", "ins",
+    "kbd",
+    "map",
+    "noscript", "ns:svg",
+    "object", "ol",
+    "p", "pre",
+    "q",
+    "samp", "script", "small", "span", "strong", "sub", "sup",
+    "table", "tt",
+    "ul"
+]
 
 class ReadableDocument():
 
@@ -17,6 +39,24 @@ class ReadableDocument():
         response = requests.get(url)
         doc = Document(response.text)
         return doc
+
+    def download_images(self, soup):
+
+        img_files = []
+
+        imgs = soup.find_all("img", src=True)
+        for img in imgs:
+            img_src = img["src"]
+            file_name = os.path.basename(img_src)
+            img_files.append(file_name)
+            resp = requests.get(img_src, stream=True)
+            if resp.status_code == 200:
+                with open(file_name, "wb") as f:
+                    shutil.copyfileobj(resp.raw, f)
+                    print(f"saved file {file_name}")
+                img["src"] = "Images/" + file_name
+
+        return img_files
 
     def parse_document(self, document):
         title = document.title()
@@ -50,6 +90,14 @@ class ReadableDocument():
 
         return re.sub(pattern, replacement, string)
 
+    def validate_tags(self, soup):
+
+        for tag in soup.find_all():
+            if tag.name not in valid_tags:
+                invalid_tag = soup.find(tag.name)
+                invalid_tag.name = "div"
+        return soup
+
     def get_readable_document(self):
         document = self.download_html(self.url)
         article = self.parse_document(document)
@@ -63,6 +111,14 @@ class ReadableDocument():
 
         soup = BeautifulSoup(article, 'html.parser')
 
+        for img in soup.find_all("img"):
+            print(img["src"])
+
+        img_filenames = self.download_images(soup)
+
+        for img in soup.find_all("img"):
+            print(img["src"])
+        
         if not soup.html.has_attr("xmlns"):
             soup.html["xmlns"] = "http://www.w3.org/1999/xhtml"
 
@@ -73,4 +129,6 @@ class ReadableDocument():
             head.append(title_tag)
             soup.html.body.insert_before(head)
 
-        return title, str(soup)
+        soup = self.validate_tags(soup)
+
+        return title, soup.prettify(), img_filenames

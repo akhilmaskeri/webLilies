@@ -8,10 +8,10 @@ url = sys.argv[1]
 
 print("creating readable document")
 readable_doc = ReadableDocument(url)
-title, doc = readable_doc.get_readable_document()
+title, doc, imgs = readable_doc.get_readable_document()
 
 print("makding epub file")
-file_name = make_epub(doc, title)
+file_name = make_epub(doc, title, imgs=imgs)
 
 print(f"sending you the file: {file_name}")
 mailman = MailMan(

@@ -12,7 +12,7 @@
     <navMap>
         <navPoint id="navPoint-1" playOrder="1">
             <navLabel>
-                <text>CHAPTER 1</text>
+                <text>Article</text>
             </navLabel>
             <content src="Text/article.html"/>
         </navPoint>
