@@ -1,17 +1,21 @@
 import sys
-
-from readable import ReadableDocument
-from epub import make_epub
+from arc90doc import Arc90Doc
+from epub import Epub
 from send_mail import MailMan
 
 url = sys.argv[1]
 
-print("creating readable document")
-readable_doc = ReadableDocument(url)
-title, doc, imgs = readable_doc.get_readable_document()
+doc = Arc90Doc(url)
+doc.parse()
 
-print("makding epub file")
-file_name = make_epub(doc, title, imgs=imgs)
+epub = Epub(
+  url=url,
+  title=doc.title,
+  content=doc.content,
+  author=doc.author
+)
+
+file_name = epub.save(path=".")
 
 print(f"sending you the file: {file_name}")
 mailman = MailMan(

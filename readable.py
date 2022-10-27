@@ -33,7 +33,6 @@ class ReadableDocument():
     def __init__(self, url):
         self.url = url
         self.split_url = urlsplit(url)
-        self.clean = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
 
     def download_html(self, url):
         response = requests.get(url)
@@ -132,6 +131,17 @@ class ReadableDocument():
             title_tag.string = title
             head.append(title_tag)
             soup.html.body.insert_before(head)
+
+        title_heading = soup.new_tag("h1")
+        title_heading.string = title
+        soup.html.body.insert(position=0, new_child=title_heading)
+
+        small = soup.new_tag("small")
+        original_article = soup.new_tag("a")
+        original_article.string = "Read Original Article here."
+        original_article["href"] = self.url
+        small.append(original_article)
+        soup.html.body.insert(position=1, new_child=small)
 
         soup = self.validate_tags(soup)
 
