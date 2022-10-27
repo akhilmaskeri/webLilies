@@ -11,7 +11,7 @@ def make_epub(document, title="article", author="Unknown", imgs=None):
 
     # tmp_name = "/tmp/" + str(uuid.uuid1())
     tmp_name = str(uuid.uuid1())
-    
+
     dirs = [
         tmp_name,
         tmp_name + "/" + "META-INF",
@@ -25,8 +25,11 @@ def make_epub(document, title="article", author="Unknown", imgs=None):
         os.mkdir(dir)
 
     for img in imgs:
-        print(f"moving image {img} to", tmp_name + "/" + "OEBPS/Images")
-        shutil.move(img, tmp_name + "/" + "OEBPS/Images")
+        try:
+            print(f"moving image {img} to", tmp_name + "/" + "OEBPS/Images")
+            shutil.move(img, tmp_name + "/" + "OEBPS/Images")
+        except shutil.Error as err:
+            print(f"failed to move img {img} -> {str(err)}")
 
     shutil.copy("templates/container.xml", tmp_name+"/META-INF/container.xml")
 
@@ -53,7 +56,7 @@ def make_epub(document, title="article", author="Unknown", imgs=None):
 
     epub_file_name = f"{title}.epub"
 
-    with ZipFile(epub_file_name, mode="w") as archive:    
+    with ZipFile(epub_file_name, mode="w") as archive:
         archive.write(f"templates/mimetype", arcname="mimetype")
         archive.write(f"{tmp_name}/META-INF/container.xml", arcname="META-INF/container.xml")
         archive.write(f"{tmp_name}/OEBPS/content.opf", arcname="OEBPS/content.opf")
@@ -61,7 +64,10 @@ def make_epub(document, title="article", author="Unknown", imgs=None):
         archive.write(f"{tmp_name}/OEBPS", arcname="OEBPS")
 
         for img in imgs:
-            archive.write(f"{tmp_name}/OEBPS/Images/{img}", arcname=f"OEBPS/Images/{img}")
+            try:
+                archive.write(f"{tmp_name}/OEBPS/Images/{img}", arcname=f"OEBPS/Images/{img}")
+            except Exception as e:
+                print(e)
 
         archive.write(f"{tmp_name}/OEBPS/article.html", arcname="OEBPS/article.html")
         archive.write(f"{tmp_name}/OEBPS/Styles/stylesheet.css", arcname="OEBPS/Styles/stylesheet.css")

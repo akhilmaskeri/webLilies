@@ -48,6 +48,10 @@ class ReadableDocument():
         for img in imgs:
             img_src = img["src"]
             file_name = os.path.basename(img_src)
+
+            if "?" in file_name:
+                file_name = file_name.split("?")[0]
+
             img_files.append(file_name)
             resp = requests.get(img_src, stream=True)
             if resp.status_code == 200:
@@ -118,7 +122,7 @@ class ReadableDocument():
 
         for img in soup.find_all("img"):
             print(img["src"])
-        
+
         if not soup.html.has_attr("xmlns"):
             soup.html["xmlns"] = "http://www.w3.org/1999/xhtml"
 
