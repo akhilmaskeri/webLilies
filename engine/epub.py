@@ -50,6 +50,7 @@ class Epub():
 
         images = self.soup.find_all("img")
         for img in images:
+
             src = img["src"]
             file_name = os.path.basename(src)
 
@@ -63,9 +64,21 @@ class Epub():
                 if resp.status_code == 200:
                     with open(file_name, "wb") as img_file:
                         shutil.copyfileobj(resp.raw, img_file)
+                        img["src"] = "Images/" + file_name
+
+                        attributes = list(img.attrs)
+
+                        if "srcset" in attributes:
+                            del img["srcset"]
+
+                        if "class" in attributes:
+                            del img["class"]
+
+                        if "loading" in attributes:
+                            del img["loading"]
 
             except requests.exceptions.ConnectTimeout:
-                logger.info(f"connection timedout for {src}")
+                print(f"connection timedout for {src}")
                 # remove the object from soup
                 img.decompose()
                 self.images.pop()
@@ -84,7 +97,6 @@ class Epub():
 
         new_content = re.sub(pattern, replacement, self.content)
         self.content = new_content
-
     
     def remove_hex_characters(self):
         """

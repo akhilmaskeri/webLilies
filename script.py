@@ -1,7 +1,7 @@
 import sys
-from arc90doc import Arc90Doc
-from epub import Epub
-from send_mail import MailMan
+from engine.arc90doc import Arc90Doc
+from engine.epub import Epub
+from mailman.send_mail import MailMan
 
 url = sys.argv[1]
 
