@@ -1,0 +1,8 @@
+#!/bin/bash
+
+gunicorn \
+	--certfile=keys/fullchain.pem \
+	--keyfile=keys/privkey.pem \
+	--bind 0.0.0.0:443 \
+	app:app \
+	--daemon

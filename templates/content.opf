@@ -11,8 +11,8 @@
         <item id="article.html" href="article.html" media-type="application/xhtml+xml"/>
         <item id="stylesheet.css" href="Styles/stylesheet.css" media-type="text/css"/>
         {% for img in imgs -%}
-            {% set media_type = img.split('.')[-1] %}
-            <item id="image_{{ loop.index|string }}" href="Images/{{ img }}" media-type="image/jpeg" />
+            {% set media_type = "jpeg" if img.split('.')[-1] in ("jpg", "jpeg") else img.split('.')[-1] %}
+	<item id="image_{{ loop.index|string }}" href="Images/{{ img }}" media-type="image/{{ media_type }}" />
         {% endfor %}
     </manifest>
     <spine toc="ncx">

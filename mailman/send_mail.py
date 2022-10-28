@@ -4,6 +4,10 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 
+import logging
+logger = logging.getLogger("torchd")
+
+import traceback
 
 class MailMan():
 
@@ -19,7 +23,7 @@ class MailMan():
 
     def attach_file(self, file_name:str = None):
 
-        print(f"attaching file {file_name}")
+        logger.info(f"attaching file: {file_name}")
 
         with open(file_name, "rb") as attachment:
             part = MIMEBase("application", "octet-stream")
@@ -38,6 +42,7 @@ class MailMan():
         self.message.attach(part)
 
     def send(self):
+
         try:
 
             server = smtplib.SMTP(self.smtp_server, self.port)
@@ -46,13 +51,22 @@ class MailMan():
             server.ehlo()
             server.login(self.sender_email, self.password)
 
+        except Exception as e:
+            logger.info(traceback.format_exc())
+
+        if True:
             recipients = ""
+
+            logger.info("recipients %s", self.recipients_list)
             
             if type(self.recipients_list) == str:
                 recipients = self.recipients_list
             else:
-                ",".join(self.recipients_list)
+                recipients = ",".join(self.recipients_list)
 
+            self.message["To"] = recipients
+
+        try:
             server.sendmail(
                 self.sender_email,
                 recipients,
@@ -60,4 +74,4 @@ class MailMan():
             )
             server.close() 
         except Exception as e:
-            print(e)
+            logger.info(traceback.format_exc())

@@ -9,6 +9,9 @@ from zipfile import ZipFile
 from bs4 import BeautifulSoup
 from jinja2 import Template
 
+import logging
+logger = logging.getLogger("torchd")
+
 class Epub():
 
     EPUB_VALID_TAGS  = [
@@ -43,7 +46,6 @@ class Epub():
         self.split_url = urlsplit(url)
         
 
-
     def download_images(self, path="."):
 
         images = self.soup.find_all("img")
@@ -55,11 +57,18 @@ class Epub():
                 file_name = file_name.split("?")[0]
 
             self.images.append(file_name)
+            try:
+                resp = requests.get(src, stream=True, timeout=7)
 
-            resp = requests.get(src, stream=True)
-            if resp.status_code == 200:
-                with open(file_name, "wb") as img_file:
-                    shutil.copyfileobj(resp.raw, img_file)
+                if resp.status_code == 200:
+                    with open(file_name, "wb") as img_file:
+                        shutil.copyfileobj(resp.raw, img_file)
+
+            except requests.exceptions.ConnectTimeout:
+                logger.info(f"connection timedout for {src}")
+                # remove the object from soup
+                img.decompose()
+                self.images.pop()
 
 
     def replace_empty_links(self):
@@ -155,10 +164,6 @@ class Epub():
                 )
                 archive.writestr("OEBPS/content.opf", content_opf)
 
-                # content_opf_file = open(OEBPS + "/content.opf", "w")
-                # content_opf_file.write(content_opf)
-                # content_opf_file.close()    
-
             with open("templates/toc.ncx", "r") as f:
                 content = f.read()
                 toc_ncx = Template(content).render(
@@ -166,19 +171,15 @@ class Epub():
                     author=self.author
                 )
                 archive.writestr("OEBPS/toc.ncx", toc_ncx)
-                # toc_ncx_file = open(tmp_name+"/OEBPS/toc.ncx", "w")
-                # toc_ncx_file.write(toc_ncx)
-                # toc_ncx_file.close()
-                
 
-            # archive.write(f"{tmp_name}/OEBPS", arcname="OEBPS")
-            # with open(f"{OEBPS}/article.html", "w") as f:
-            #     f.write(self.soup.prettify())
             archive.writestr("OEBPS/article.html", self.soup.prettify())
 
             for img in self.images:
-                shutil.move(img, IMAGES)
-                archive.write(f"{IMAGES}/{img}", arcname=f"OEBPS/Images/{img}")
+                try:
+                    shutil.move(img, IMAGES)
+                    archive.write(f"{IMAGES}/{img}", arcname=f"OEBPS/Images/{img}")
+                except shutil.Error:
+                    logger.info("Error moving image file")
 
         shutil.rmtree(tmp_name)
         return epub_file_name
