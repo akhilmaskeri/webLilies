@@ -104,14 +104,6 @@ class Epub():
 
         new_content = re.sub(pattern, replacement, self.content)
         self.content = new_content
-    
-    def remove_hex_characters(self):
-        """
-            remove hex content if present
-        """
-        new_content = re.sub(r'[^\x00-\x7f]', r'', self.content)
-        self.content = new_content
-
 
     def replace_invalid_tags(self):
         for tag in self.soup.find_all():
@@ -122,7 +114,6 @@ class Epub():
 
     def make(self):
         self.replace_empty_links()
-        self.remove_hex_characters()
 
         self.soup = BeautifulSoup(self.content, 'html.parser')
         self.soup.html["xmlns"] = "http://www.w3.org/1999/xhtml"
