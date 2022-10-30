@@ -1,5 +1,7 @@
 import os
 
+import telegram
+
 from db.Database import DeviceIDMap
 
 from engine.arc90doc import Arc90Doc
@@ -15,32 +17,41 @@ class Handle():
     def start(bot, update):
 
         chat_id = update.message.chat.id
-        user = update.message.chat.username 
+        user = update.message.chat.first_name
 
-        message = "Hello " + user + "\n"
-        message += "Looks like I don't have your amazon deviceID yet" + "\n"
-        message += "Please provide your deviceID" + "\n\n"
-        message += "Wondering how to get? use this https://www.amazon.in/hz/mycd/digital-console/contentlist/booksAll/"
+        logger.info(update)
+
+        message =  "Hello " + user + "!\n\n"
+        message += "This bot is developed to enable user to download blogs on kindle app" + "\n"
+        message += "Bind your kindle email and send url which appears as a readable document in your kindle app." + "\n\n"
+        message += "Wondering how to get kindle email? use this https://www.amazon.in/hz/mycd/digital-console/contentlist/booksAll/" + "\n"
+        message += "Preferences > Personal Document Settings > Send-to-Kindle E-Mail Settings"
 
         bot.send_message(chat_id, text=message)
 
+
+    @staticmethod
+    def bind(bot, update):
+        chat_id = update.message.chat.id
+        bot.send_message(chat_id, text="bind address", reply_markup=telegram.ForceReply())
+
+
     @staticmethod
     def device_id(bot, update, device):
-
         chat_id = update.message.chat.id
-        user_id = update.message.chat.id
 
-        logger.info("recieved device id:", device)
+        user_id = update.message.chat.id
 
         device_id_map = DeviceIDMap()
         device_id_map.set_device_id(user_id, device)
 
         message = "Gotcha!" + "\n"
-        message += "Dont forget to add \"dmakhil@gmail.com\" to your Approved Personal Document E-mail List" + "\n\n"
+        message += "Dont forget to add \"webliliesbot@gmail.com\" to your Approved Personal Document E-mail List" + "\n\n"
         message += "Wondering where to add?" + "\n\n" 
         message += "check here https://www.amazon.in/hz/mycd/myx?ref=myk_mkmw_mig_IN" + "\n\n"
         message += "Preferences > Personal Document Settings > Approved Personal Document E-mail List"
         bot.send_message(chat_id, text=message)
+
 
     @staticmethod
     def link(update, links):
@@ -83,3 +94,27 @@ class Handle():
 
         os.remove(file_name)
 
+    @staticmethod
+    def ping(bot, update):
+        chat_id = update.message.chat.id
+        bot.send_message(chat_id, text="pong")
+
+
+    @staticmethod
+    def help(bot, update):
+
+        help_msg = "This bot is developed to download blogs on your kindle app" + "\n\n"
+
+        help_msg += "Firstly, Bind your kindle email using \\bind" + "\n"
+        help_msg += "Wondering where to get kindle email?\ncheck this https://www.amazon.in/hz/mycd/digital-console/contentlist/booksAll/" + "\n"
+        help_msg += "Preferences > Personal Document Settings > Send-to-Kindle E-Mail Settings" + "\n\n"
+
+        help_msg += "Secondly, add webliliesbot@gmail.com to your Approved Personal Document E-mail List" + "\n"
+        help_msg += "Wondering where to add?" + "\n" 
+        help_msg += "check here https://www.amazon.in/hz/mycd/myx?ref=myk_mkmw_mig_IN" + "\n"
+        help_msg += "Preferences > Personal Document Settings > Approved Personal Document E-mail List" + "\n\n"
+
+        help_msg += "Finally, send url and if everything goes well, it should appear in your kindle devices"
+
+        chat_id  = update.message.chat.id
+        bot.send_message(chat_id, text=help_msg)

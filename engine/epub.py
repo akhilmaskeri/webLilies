@@ -82,6 +82,13 @@ class Epub():
                 # remove the object from soup
                 img.decompose()
                 self.images.pop()
+            except requests.exceptions.InvalidSchema:
+                # should I merge them?
+
+                print(f"invalid scheam {src}")
+                # remove the object from soup
+                img.decompose()
+                self.images.pop()
 
 
     def replace_empty_links(self):

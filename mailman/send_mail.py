@@ -44,7 +44,6 @@ class MailMan():
     def send(self):
 
         try:
-
             server = smtplib.SMTP(self.smtp_server, self.port)
             server.ehlo()
             server.starttls()
@@ -67,6 +66,8 @@ class MailMan():
             self.message["To"] = recipients
 
         try:
+
+            logger.info("sender : %s", self.sender_email)
             server.sendmail(
                 self.sender_email,
                 recipients,
