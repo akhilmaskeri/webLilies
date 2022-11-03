@@ -3,4 +3,3 @@ webLilies is a telegram bot that allows you to have web-page contents appear in 
 This is similar send to kindle service.
 
 bot: @torchdwebbot
-
