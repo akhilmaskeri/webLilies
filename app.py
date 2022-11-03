@@ -13,7 +13,6 @@ from constants import TOKEN, USERNAME, URL
 import logging
 
 log_format = '[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
-
 logging.basicConfig(filename="xapp.log", level=logging.DEBUG, format=log_format)
 logger = logging.getLogger("torchd")
 
@@ -24,7 +23,7 @@ bot = telegram.Bot(token=TOKEN)
 def repsond():
 
     update = telegram.Update.de_json(request.get_json(force=True), bot)
-    print(update)
+    logger.debug(update)
     try:
         chat_id = update.message.chat.id
         msg_id = update.message.message_id
@@ -52,10 +51,10 @@ def repsond():
 
     if update.message.reply_to_message:
 
-        print(update.message.reply_to_message)
+        logger.debug(update.message.reply_to_message)
 
         if update.message.reply_to_message.text == "bind address":
-            print("bind address")
+            logger.debug("bind address")
             device_id_value = update.message.text
 
             device_id_regex = r"[\w_-]+@kindle.com"

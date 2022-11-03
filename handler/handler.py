@@ -19,15 +19,23 @@ class Handle():
         chat_id = update.message.chat.id
         user = update.message.chat.first_name
 
-        logger.info(update)
+        help_msg =  "Hello " + user + "!\n\n"
 
-        message =  "Hello " + user + "!\n\n"
-        message += "This bot is developed to enable user to download blogs on kindle app" + "\n"
-        message += "Bind your kindle email and send url which appears as a readable document in your kindle app." + "\n\n"
-        message += "Wondering how to get kindle email? use this https://www.amazon.in/hz/mycd/digital-console/contentlist/booksAll/" + "\n"
-        message += "Preferences > Personal Document Settings > Send-to-Kindle E-Mail Settings"
+        help_msg += "This bot is developed to download blogs on your kindle app" + "\n\n"
 
-        bot.send_message(chat_id, text=message)
+        help_msg += "Firstly, Bind your kindle email using /bind" + "\n"
+        help_msg += "Wondering where to get kindle email? check this https://www.amazon.in/hz/mycd/myx#/home/settings/payment" + "\n"
+        help_msg += "Preferences > Personal Document Settings > Send-to-Kindle E-Mail Settings" + "\n"
+        help_msg += "copy your kindle email id (something like yourkindledeviceid@kindle.com) and bind it" + "\n\n"
+
+        help_msg += "Secondly, add webliliesbot@gmail.com to your Approved Personal Document E-mail List" + "\n"
+        help_msg += "Wondering where to add?" + "\n" 
+        help_msg += "check here https://www.amazon.in/hz/mycd/myx#/home/settings/payment" + "\n"
+        help_msg += "Preferences > Personal Document Settings > Approved Personal Document E-mail List" + "\n\n"
+
+        help_msg += "Finally, send url and if everything goes well, it should appear in your kindle devices"
+
+        bot.send_message(chat_id, text=help_msg)
 
 
     @staticmethod
@@ -105,13 +113,14 @@ class Handle():
 
         help_msg = "This bot is developed to download blogs on your kindle app" + "\n\n"
 
-        help_msg += "Firstly, Bind your kindle email using \\bind" + "\n"
-        help_msg += "Wondering where to get kindle email?\ncheck this https://www.amazon.in/hz/mycd/digital-console/contentlist/booksAll/" + "\n"
-        help_msg += "Preferences > Personal Document Settings > Send-to-Kindle E-Mail Settings" + "\n\n"
+        help_msg += "Firstly, Bind your kindle email using /bind" + "\n"
+        help_msg += "Wondering where to get kindle email? check this https://www.amazon.in/hz/mycd/myx#/home/settings/payment" + "\n"
+        help_msg += "Preferences > Personal Document Settings > Send-to-Kindle E-Mail Settings" + "\n"
+        help_msg += "copy your kindle email id (something like yourkindledeviceid@kindle.com) and bind it" + "\n\n"
 
         help_msg += "Secondly, add webliliesbot@gmail.com to your Approved Personal Document E-mail List" + "\n"
         help_msg += "Wondering where to add?" + "\n" 
-        help_msg += "check here https://www.amazon.in/hz/mycd/myx?ref=myk_mkmw_mig_IN" + "\n"
+        help_msg += "check here https://www.amazon.in/hz/mycd/myx#/home/settings/payment" + "\n"
         help_msg += "Preferences > Personal Document Settings > Approved Personal Document E-mail List" + "\n\n"
 
         help_msg += "Finally, send url and if everything goes well, it should appear in your kindle devices"

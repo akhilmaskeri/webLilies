@@ -1,2 +1,6 @@
-send article from web straight to your kindle device
-> $python script.py web-url
+# webLilies
+webLilies is a telegram bot that allows you to have web-page contents appear in your kindle devices.
+This is similar send to kindle service.
+
+bot: @torchdwebbot
+
