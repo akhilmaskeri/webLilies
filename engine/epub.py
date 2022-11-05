@@ -25,7 +25,7 @@ class Epub():
         "html", "head", "title",
         "i", "iframe", "img", "ins",
         "kbd",
-        "map",
+        "map", "meta",
         "noscript", "ns:svg",
         "object", "ol",
         "p", "pre",
@@ -44,7 +44,6 @@ class Epub():
         self.images = []
 
         self.split_url = urlsplit(url)
-        
 
     def download_images(self, path="."):
 
@@ -105,6 +104,30 @@ class Epub():
         new_content = re.sub(pattern, replacement, self.content)
         self.content = new_content
 
+    def replace_unicode_chars(self):
+        """
+            I dont know what's up with kindle reader
+            it acts wierd with unicode chars
+
+            this function might go away
+        """
+
+        punctuation_map = {
+            "’": "'",
+            "’": "'",
+            "‚": ",",
+            "‛": "'",
+            "“": "\"",
+            "”": "\"",
+            "‟": "\"",
+            "′": "'",
+            "″": "\"",
+        }
+
+        for unicode_char, ascii_eq in punctuation_map.items():
+            new_content = re.sub(unicode_char, ascii_eq, self.content)
+            self.content = new_content
+
     def replace_invalid_tags(self):
         for tag in self.soup.find_all():
             if tag.name not in self.EPUB_VALID_TAGS:
@@ -114,6 +137,7 @@ class Epub():
 
     def make(self):
         self.replace_empty_links()
+        self.replace_unicode_chars()
 
         self.soup = BeautifulSoup(self.content, 'html.parser')
         self.soup.html["xmlns"] = "http://www.w3.org/1999/xhtml"
@@ -121,8 +145,14 @@ class Epub():
         if not self.soup.html.head:
             title_tag = self.soup.new_tag("title")
             title_tag.string = self.title
+
+            meta_charset = self.soup.new_tag("meta")
+            meta_charset["content"] = "text/html; charset=utf-8"
+
             head_tag = self.soup.new_tag("head")
+            head_tag.append(meta_charset)
             head_tag.append(title_tag)
+            
             self.soup.html.body.insert_before(head_tag)
 
         heading = self.soup.new_tag("h1")
